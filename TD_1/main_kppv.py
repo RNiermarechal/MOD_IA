@@ -109,6 +109,5 @@ def influence_param_k(path,k_max):
 
 # influence_param_k(path, 20)
 
-
-for path in L_path:
-    influence_param_k(path, 200)
+#for path in L_path:
+    #influence_param_k(path, 200)
