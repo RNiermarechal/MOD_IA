@@ -20,7 +20,7 @@ def unpickle(file):
 
 def lecture_cifar(file):
     file_extracted=unpickle(file)
-    Y=np.array(file_extracted[b'labels'])
+    Y=np.transpose(np.array([file_extracted[b'labels']]))
     X=np.array(file_extracted[b'data'],dtype='float32')
     return X,Y
 
