@@ -53,21 +53,35 @@ lr=1e-4 # learning rate
 n_iter= 2000 # iterations pour apprentissage du modele
 
 def back_propagate(X,Y,O1,O2,W1,W2,B1,B2,lr):
+    ## Gradient pour W2
     dL_dI2=(O2-Y)*((1-O2)*O2)
     dL_dw2=np.dot(np.transpose(O1),dL_dI2)
-    dO1_dw1=np.dot(np.diagflat((1-O1)*O1),np.kron(np.eye(O1.shape[-1]),X)) #300x20
-    dI2_dw1=np.dot(np.kron(np.transpose(W2),np.ones(X.shape[0])),dO1_dw1)
-    # dI2_dw1=np.dot(np.transpose(W2),dO1_dw1)
-    dL_dw1=np.dot(dL_dI2,dI2_dw1)
 
+    ## Gradient pour W1
+    dL_dO1=np.dot(dL_dI2,np.transpose(W2))
+    dL_dI1=np.multiply(dL_dO1,(O1*(1-O1)))
+    dL_dw1=np.dot(np.transpose(X),dL_dI1)
+
+    ## Gradient pour B2
     dL_db2=dL_dI2
 
+    ##Essais
+    # dO1_dw1=np.dot(np.diagflat((1-O1)*O1),np.kron(np.eye(O1.shape[-1]),X)) #300x20
+    # dI2_dw1=np.dot(np.kron(np.transpose(W2),np.ones(X.shape[0])),dO1_dw1)
+    # dI2_dw1=np.dot(np.transpose(W2),dO1_dw1)
+    # dL_dw1=np.dot(dL_dI2,dI2_dw1)
+    
+    # test=np.multiply(np.dot((O2-Y),np.transpose(W2)),(O1*(1-O1)))
+    # test=np.multiply(np.dot(dL_dI2,np.transpose(W2)),(O1*(1-O1)))
+
+    
+
     # Update des parametres du modele
-    w1=W1-dL_dw1*lr# pour w1
+    w1=W1-dL_dw1*lr # pour w1
     # pour b1
-    w2=W2-dL_dw2*lr# pour w2
-    # pour b2
-    b2=B2-dL_db2*lr
+    w2=W2-dL_dw2*lr # pour w2
+    b2=B2-dL_db2*lr # pour b2
+    
 
     return w2,b2
 
