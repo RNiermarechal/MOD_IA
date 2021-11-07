@@ -1,7 +1,11 @@
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
-# path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/TD_1/cifar-10-batches-py/data_batch_2'
+from skimage.color import rgb2gray
+from skimage.feature import local_binary_pattern
+
+
+path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/'
 
 L_path=[]
 for i in range(1,6):
@@ -19,9 +23,21 @@ def unpickle(file):
 # data=dict[b'data']
 
 def lecture_cifar(file):
-    file_extracted=unpickle(file)
+    L_path=[]
+    for i in range(1,6):
+        L_path.append(file+'data_batch_'+str(i))
+        L_path.append(file+'test_batch')
+    
+    path=L_path[0]
+    file_extracted=unpickle(path)
     Y=np.transpose(np.array([file_extracted[b'labels']]))
     X=np.array(file_extracted[b'data'],dtype='float32')
+    for path in L_path[1:]:
+        file_extracted=unpickle(path)
+        y=np.transpose(np.array([file_extracted[b'labels']]))
+        x=np.array(file_extracted[b'data'],dtype='float32')
+        X=np.append(X,x,axis=0)
+        Y=np.append(Y,y,axis=0)
     return X,Y
 
 # X,Y=lecture_cifar(path)
@@ -111,3 +127,31 @@ def influence_param_k(path,k_max):
 
 #for path in L_path:
     #influence_param_k(path, 200)
+
+def add_LPB(X):
+    images_LPB = [] # liste à retourner
+    # Transformer les images en noir et blanc
+    for x in X:
+        image_2D_grey=np.zeros((32,32))
+        for i in range(32):
+            for j in range(32):
+                image_2D_grey[i,j]=0.2125*x[32*i + j]+0.7154*x[1*32**2 + 32*i + j]+0.0721*x[2*32**2 + 32*i + j] # image RGB en 2D, chaque triplet de couleur est un tuple pour pouvoir appliquer la méthode rgb2gray
+        # plt.figure()
+        # plt.imshow(image_2D_grey, cmap='gray')
+        # plt.show()
+
+        # descripteur LBP
+        image_2D_LPB = local_binary_pattern(image_2D_grey,8,2,method='uniform')
+        # plt.imshow(lbp_image, cmap='gray')
+        # plt.show()
+
+        #Reviens au format des images de la base de données cifar
+        image_LBP_flat = image_2D_LPB[0]
+        for i in range(1,len(image_2D_LPB)):
+            image_LBP_flat = np.concatenate((image_LBP_flat,image_2D_LPB[i]), axis = 0)
+
+        images_LPB.append(image_LBP_flat)
+    return np.array(lbp_images)
+
+X,Y=lecture_cifar(path)
+add_LPB(X)
