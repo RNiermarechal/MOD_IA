@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 L_path=[]
 for i in range(1,6):
-    L_path.append('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/TD_1/cifar-10-batches-py/data_batch_'+str(i))
-    L_path.append('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/TD_1/cifar-10-batches-py/test_batch')
+    L_path.append('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/data_batch_'+str(i))
+    L_path.append('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/test_batch')
 
 def unpickle(file):
     import pickle

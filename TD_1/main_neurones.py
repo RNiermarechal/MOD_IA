@@ -1,6 +1,6 @@
 import numpy as np
 import skimage
-from main_kppv import unpickle,lecture_cifar
+from main_kppv import unpickle,lecture_cifar,evaluation_classifieur
 import matplotlib.pyplot as plt
 
 np.random.seed(1) # pour que l'exécution soit déterministe
@@ -120,12 +120,15 @@ def train_nn_2layers(path,D_h,lr,n_iter):
 
     ## Back propagation
     loss_list=[]
+    accuracy_list=[]
     for n in range(n_iter):
         O1,O2,loss=forward(X, W1, B1, W2, B2, Y)
         W1,B1,W2,B2=back_propagate(X, Y, O1, O2, W1, W2, B1, B2, lr)
         loss_list.append(loss)
+        accuracy_list.append(evaluation_classifieur(Y, np.round(O2)))
 
+    return loss_list,accuracy_list
     plt.plot(loss_list)
     plt.show()
 
-train_nn_2layers('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/TD_1/cifar-10-batches-py/data_batch_1',10000,1e-2,200)
+# train_nn_2layers('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/TD_1/cifar-10-batches-py/data_batch_1',10000,1e-2,200)
