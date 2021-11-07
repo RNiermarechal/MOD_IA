@@ -17,18 +17,18 @@ np.random.seed(1) # pour que l'exécution soit déterministe
 # D_in est la dimension des données d'entrée
 # D_h le nombre de neurones de la couche cachée
 # D_out est la dimension de sortie (nombre de neurones de la couche de sortie)
-N, D_in, D_h, D_out = 30, 2, 10, 3
+# N, D_in, D_h, D_out = 30, 2, 10, 3
 
-# Création d'une matrice d'entrée X et de sortie Y avec des valeurs aléatoires
+# # Création d'une matrice d'entrée X et de sortie Y avec des valeurs aléatoires
 
-X = np.random.random((N, D_in))
-Y = np.random.random((N, D_out))
+# X = np.random.random((N, D_in))
+# Y = np.random.random((N, D_out))
 
-# Initialisation aléatoire des poids du réseau
-W1 = 2 * np.random.random((D_in, D_h)) - 1
-b1 = np.zeros((1,D_h))
-W2 = 2 * np.random.random((D_h, D_out)) - 1
-b2 = np.zeros((1,D_out))
+# # Initialisation aléatoire des poids du réseau
+# W1 = 2 * np.random.random((D_in, D_h)) - 1
+# b1 = np.zeros((1,D_h))
+# W2 = 2 * np.random.random((D_h, D_out)) - 1
+# b2 = np.zeros((1,D_out))
 
 
 def forward(X,W1,b1,W2,b2,Y):
@@ -93,8 +93,8 @@ def back_propagate(X,Y,O1,O2,W1,W2,B1,B2,lr):
 def train_nn_2layers(path,D_h,lr,n_iter):
 
     X,Y=lecture_cifar(path)
-    X=X[:10,:]/255 # rescale pour faciliter la convergence
-    Y=Y[:10,:]
+    X=X[:,:]/255 # rescale pour faciliter la convergence
+    Y=Y[:,:]
     N,D_in=X.shape
     D_out=1
     ##########################

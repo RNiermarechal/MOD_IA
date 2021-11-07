@@ -64,6 +64,48 @@ def change_learning_rate(path):
     plt.show()
 
         
+def use_mini_batch(path,nb_batches,n_iter,D_h):
+    
+    X,Y=lecture_cifar(path)
+    N,D_in=X.shape
+    D_out=1
 
-change_nb_neurons(path)
-change_learning_rate(path)
+    # Génération aléatoire des mini batches
+    mini_batches=np.split(np.random.permutation(np.arange(0,N)),nb_batches)
+    D_out=1
+    
+    # Initialisation aléatoire des poids du réseau
+    W1 = 2 * np.random.random((D_in, D_h)) - 1
+    B1 = np.zeros((1,D_h))
+    W2 = 2 * np.random.random((D_h, D_out)) - 1
+    B2 = np.zeros((1,D_out))
+    loss_list=[]
+    accuracy_list=[]
+
+    for batch in mini_batches:
+        X_batch=X[list(batch)]/255
+        Y_batch=Y[list(batch)]
+    
+        ## Back propagation
+        
+        for n in range(n_iter):
+            O1,O2,loss=forward(X_batch, W1, B1, W2, B2, Y_batch)
+            W1,B1,W2,B2=back_propagate(X_batch, Y_batch, O1, O2, W1, W2, B1, B2, lr)
+            loss_list.append(loss)
+            accuracy_list.append(evaluation_classifieur(Y_batch, np.round(O2)))
+    
+    return loss_list,accuracy_list
+
+# change_nb_neurons(path)
+# change_learning_rate(path)
+
+
+def mini_batches(path):
+    nb_batches=5
+    n_iter=1000
+    D_h=1000
+    lr=1e-2
+    loss_mini_b,accuracy_mini_b=use_mini_batch(path, nb_batches, n_iter, D_h)
+    loss_full,accuracy_full=train_nn_2layers(path, D_h, lr, n_iter)
+
+mini_batches(path)
