@@ -2,11 +2,12 @@ from main_neurones import *
 
 path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/'
 def change_nb_neurons(path):
+    X,Y=lecture_cifar(path)
     losses=[]
     accuracies=[]
     list_nb_neurons=range(1,2001,500)
     for nb_neurons in list_nb_neurons:
-        loss_list,accuracy_list=train_nn_2layers(path,nb_neurons,1e-4,50)
+        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-3,200)
         losses.append(loss_list)
         accuracies.append(accuracy_list)
     plt.figure(figsize=(12,8))
@@ -23,14 +24,15 @@ def change_nb_neurons(path):
     plt.xlabel("Itérations")
     plt.legend()
     plt.savefig(fname='results_change_nb_neurons_1.png',format='png')
+    print("Influence du nombre de neurones de la couche cachée sur la vitesse de convergence : DONE")
 
     #plt.show()
 
     losses_end=[] # loss à la fin de l'optimisation des poids
     accuracies_end=[] # accuracy à la fin de l'optimisation des poids
-    list_Dh=range(1,2000,100)
+    list_Dh=range(1,2000,50)
     for nb_neurons in list_Dh:
-        loss_list,accuracy_list=train_nn_2layers(path,nb_neurons,1e-4,50)
+        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-3,200)
         losses_end.append(loss_list[-1])
         accuracies_end.append(accuracy_list[-1])
     plt.figure(figsize=(12,8))
@@ -43,14 +45,17 @@ def change_nb_neurons(path):
     plt.ylabel("Accuracy à la fin de l'entrainement")
     plt.xlabel("Nombre de neurones de la couche cachée")
     plt.savefig(fname='results_change_nb_neurons_2.png',format='png')
+    print("Influence du nombre de neurones de la couche cachée sur la performance du classifieur : DONE")
+    print("Etude sensibilité nb de neurones effectuée")
 
 
 def change_learning_rate(path):
+    X,Y=lecture_cifar(path)
     losses=[]
     accuracies=[]
     lr_list=[1e-4,1e-3,1e-2,1e-1]
     for lr in lr_list:
-        loss_list,accuracy_list=train_nn_2layers(path,1000,lr,200)
+        loss_list,accuracy_list=train_nn_2layers(X,Y,1000,lr,200)
         losses.append(loss_list)
         accuracies.append(accuracy_list)
     plt.figure(figsize=(12,8))
@@ -65,6 +70,7 @@ def change_learning_rate(path):
         plt.plot(accuracy,label='l_R = '+str(lr_list[i]))
     plt.legend()
     plt.savefig(fname='results_change_learning_rate.png',format='png')
+    print("Etude sensibilité learning rate effectuée")
 
         
 def use_mini_batch(path,nb_batches,n_iter,D_h):
@@ -84,8 +90,8 @@ def use_mini_batch(path,nb_batches,n_iter,D_h):
     B2 = np.zeros((1,D_out))
     loss_list=[]
     accuracy_list=[]
-    for n in range(n_iter):
-        for batch in mini_batches:
+    for batch in mini_batches:
+        for n in range(n_iter):
             X_batch=X[list(batch)]/255
             Y_batch=Y[list(batch)]
     
@@ -99,7 +105,7 @@ def use_mini_batch(path,nb_batches,n_iter,D_h):
     return loss_list,accuracy_list
 
 change_nb_neurons(path)
-# change_learning_rate(path)
+change_learning_rate(path)
 
 
 def mini_batches(path):
@@ -113,15 +119,17 @@ def mini_batches(path):
     plt.plot(loss_full)
     plt.show()
 
-# mini_batches(path)
+mini_batches(path)
 
 def change_nb_layers(path):
+    X,Y=lecture_cifar(path)
     D_h=1000
     D_h2=1000
     lr=1e-3
     n_iter=500
-    loss_list_2,accuracy_list_2=train_nn_2layers(path, D_h, lr, n_iter)
-    loss_list_3,accuracy_list_3=train_nn_3layers(path, D_h,D_h2, lr, n_iter)
+    loss_list_2,accuracy_list_2=train_nn_2layers(X,Y, D_h, lr, n_iter)
+    loss_list_3,accuracy_list_3=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter)
+    plt.figure(figsize=(12,8))
     plt.subplot(211)
     plt.title("Ajout d'une couche sur la vitesse de convergence")
     plt.plot(loss_list_2,label='2 couches')
@@ -134,10 +142,12 @@ def change_nb_layers(path):
     plt.legend()
     plt.ylabel("Activation function")
     plt.xlabel("Nb d'itérations")
-    plt.show()
+    plt.savefig(fname='results_change_nb_layers.png',format='png')
+    print("Ajout d'une couche sur la vitesse de convergence : DONE")
+    # plt.show()
 
 
 
-# change_nb_layers(path)
+change_nb_layers(path)
 
     

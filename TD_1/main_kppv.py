@@ -2,7 +2,9 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
-from skimage.feature import local_binary_pattern
+from skimage.feature import local_binary_pattern,hog
+from skimage import data, exposure
+
 
 
 path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/'
@@ -26,7 +28,7 @@ def lecture_cifar(file):
     L_path=[]
     for i in range(1,6):
         L_path.append(file+'data_batch_'+str(i))
-        L_path.append(file+'test_batch')
+    L_path.append(file+'test_batch')
     
     path=L_path[0]
     file_extracted=unpickle(path)
@@ -38,6 +40,7 @@ def lecture_cifar(file):
         x=np.array(file_extracted[b'data'],dtype='float32')
         X=np.append(X,x,axis=0)
         Y=np.append(Y,y,axis=0)
+    print("Extraction des données CIFAR effectuée")
     return X,Y
 
 # X,Y=lecture_cifar(path)
@@ -104,54 +107,62 @@ def evaluation_classifieur(Y_test,Y_pred):
 #print(kppv_res)
 
 
-def influence_param_k(path,k_max):
-    X,Y=lecture_cifar(path)
-    X_app,Y_app,X_test,Y_test=decoupage_donnees(X, Y)
-    Dist=kppv_distances(X_test, X_app)
-    l_k=range(1,k_max)
-    l_accuracy=[]
-    for k in l_k:
-        Y_pred=kppv_predict(Dist, Y_app, k)
-        kppv_res=evaluation_classifieur(Y_test, Y_pred)
-        l_accuracy.append(kppv_res)
-    plt.figure()
-    plt.plot(l_k,l_accuracy)
-    plt.xlabel('k voisins')
-    plt.ylabel('Accuracy (%)')
-    plt.title(path.split('/')[-1])
-    
-    plt.savefig(fname=path.split('/')[-1]+'_results.png',format='png')
-    plt.savefig(fname=path.split('/')[-1]+'_results.svg',format='svg')
 
-# influence_param_k(path, 20)
 
 #for path in L_path:
     #influence_param_k(path, 200)
+def conv_2D_RGB(image_1D):
+    image_2D_RGB=np.zeros((32,32,3))
+    for i in range(32):
+        for j in range(32):
+            image_2D_RGB[i,j,0]=image_1D[32*i + j]
+            image_2D_RGB[i,j,1]=image_1D[1024 + 32*i + j]
+            image_2D_RGB[i,j,2]=image_1D[2048 + 32*i + j] # image RGB en 2D, avec RGB selon l'axe 3 pour appliquer la méthode rgb2gray
+    return image_2D_RGB
 
 def add_LPB(X):
-    images_LPB = [] # liste à retourner
-    # Transformer les images en noir et blanc
+    images_LBP = [] # liste à retourner
     for x in X:
-        image_2D_grey=np.zeros((32,32))
-        for i in range(32):
-            for j in range(32):
-                image_2D_grey[i,j]=0.2125*x[32*i + j]+0.7154*x[1*32**2 + 32*i + j]+0.0721*x[2*32**2 + 32*i + j] # image RGB en 2D, chaque triplet de couleur est un tuple pour pouvoir appliquer la méthode rgb2gray
+        image_2D_RGB=conv_2D_RGB(x) # passage format 1D à 2D
+        image_2D_grey=rgb2gray(image_2D_RGB) # Transformation des images en niveaux de gris
+        image_2D_LPB=local_binary_pattern(image_2D_grey,8,2,method='uniform') # application descripteur
+        ## Affichge si besoin
         # plt.figure()
-        # plt.imshow(image_2D_grey, cmap='gray')
+        # plt.imshow(image_2D_LPB, cmap='gray')
         # plt.show()
+        ## Retour au format CIFAR
+        image_LBP_flat=np.ravel(image_2D_LPB)
+        images_LBP.append(image_LBP_flat)
+    print("Descripteur LBP appliqué")
+    return np.array(images_LBP)
 
-        # descripteur LBP
-        image_2D_LPB = local_binary_pattern(image_2D_grey,8,2,method='uniform')
-        # plt.imshow(lbp_image, cmap='gray')
+def add_HOG(X):
+    images_HOG = [] # liste à retourner
+    for x in X:
+        image_2D_RGB=conv_2D_RGB(x) # passage format 1D à 2D
+        fd,image_2D_HOG = hog(image_2D_RGB, orientations=6, visualize=True) # application descripteur
+        
+        # #visualiser image et HOG image 
+        # plt.figure()
+        # plt.imshow(image_2D_RGB)
+        # plt.figure()
+        # plt.subplot(121) 
+        # plt.axis('off')
+        # plt.imshow(image_2D_RGB,interpolation='nearest')
+
+        # # Rescale histogram for better display        
+        # hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+        # plt.subplot(122) 
+        # plt.axis('off')
+        # plt.imshow(hog_image_rescaled, cmap=plt.cm.gray)
         # plt.show()
+        
+        ## Retour au format CIFAR
+        image_HOG_flat=np.ravel(image_2D_RGB)
+        images_HOG.append(image_HOG_flat)
+    print("Descripteur HOG appliqué")
+    return np.array(images_HOG)
 
-        #Reviens au format des images de la base de données cifar
-        image_LBP_flat = image_2D_LPB[0]
-        for i in range(1,len(image_2D_LPB)):
-            image_LBP_flat = np.concatenate((image_LBP_flat,image_2D_LPB[i]), axis = 0)
-
-        images_LPB.append(image_LBP_flat)
-    return np.array(lbp_images)
-
-X,Y=lecture_cifar(path)
-add_LPB(X)
+# X,Y=lecture_cifar(path)
+# add_LPB(X)
+# add_HOG(X)

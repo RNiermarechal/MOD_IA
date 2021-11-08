@@ -90,11 +90,10 @@ def back_propagate(X,Y,O1,O2,W1,W2,B1,B2,lr):
 
 # back_propagate(X, Y, O1, O2, W1, W2, b1, b2, lr)
 
-def train_nn_2layers(path,D_h,lr,n_iter):
+def train_nn_2layers(X,Y,D_h,lr,n_iter):
 
-    X,Y=lecture_cifar(path)
     X=X[:1000,:]/255 # rescale pour faciliter la convergence
-    Y=Y[:1000,:]
+    Y=Y[:1000,:]/9
     N,D_in=X.shape
     D_out=1
     ##########################
@@ -134,8 +133,7 @@ def train_nn_2layers(path,D_h,lr,n_iter):
 # train_nn_2layers('D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/TD_1/cifar-10-batches-py/',10000,1e-2,200)
 
 
-def train_nn_3layers(path,D_h,D_h2,lr,n_iter):
-    X,Y=lecture_cifar(path)
+def train_nn_3layers(X,Y,D_h,D_h2,lr,n_iter):
     X=X[:100,:]/255 # rescale pour faciliter la convergence
     Y=Y[:100,:]
     N,D_in=X.shape
