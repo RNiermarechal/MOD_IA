@@ -5,8 +5,8 @@ path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-bat
 ## Influence nb de voisins
 def influence_param_k(path,k_max):
     X,Y=lecture_cifar(path)
-    X=X[:30000,:]
-    Y=Y[:30000,:]
+    X=X[:20000,:]
+    Y=Y[:20000,:]
     X_app,Y_app,X_test,Y_test=decoupage_donnees(X, Y)
     Dist=kppv_distances(X_test, X_app)
     l_k=range(1,k_max,2)
@@ -27,8 +27,8 @@ def influence_param_k(path,k_max):
 ## Influence des descripteurs
 def influence_param_k_LBP(path,k_max):
     X,Y=lecture_cifar(path)
-    X=X[:30000,:]
-    Y=Y[:30000,:]
+    X=X[:20000,:]
+    Y=Y[:20000,:]
     X=add_LPB(X)
     X_app,Y_app,X_test,Y_test=decoupage_donnees(X, Y)
     Dist=kppv_distances(X_test, X_app)
@@ -49,8 +49,8 @@ def influence_param_k_LBP(path,k_max):
 
 def influence_param_k_HOG(path,k_max):
     X,Y=lecture_cifar(path)
-    X=X[:30000,:]
-    Y=Y[:30000,:]
+    X=X[:20000,:]
+    Y=Y[:20000,:]
     X=add_HOG(X)
     X_app,Y_app,X_test,Y_test=decoupage_donnees(X, Y)
     Dist=kppv_distances(X_test, X_app)
@@ -73,8 +73,8 @@ def influence_param_k_HOG(path,k_max):
 ## Influence validation croisée
 def influence_param_k_avec_validation_croisee(path,k_max,nb_batches):
     X,Y=lecture_cifar(path)
-    X=X[:30000,:]
-    Y=Y[:30000,:]
+    X=X[:20000,:]
+    Y=Y[:20000,:]
     N,D_in=X.shape
 
     # Génération aléatoire des mini batches
