@@ -68,7 +68,7 @@ def decoupage_donnees(X,Y):
 # X_app,Y_app,X_test,Y_test=decoupage_donnees(X, Y)
 
 def kppv_distances(X_test,X_app):
-    X_test_dots=(X_test*X_test).sum(axis=1).reshape(X_test.shape[0],1)*np.ones(shape=(1,X_app.shape[0]))
+    X_test_dots=(X_test*X_test).sum(axis=1).reshape(X_test.shape[0],1)*np.ones(shape=(1,X_app.shape[0]))    
     X_app_dots=(X_app*X_app).sum(axis=1)*np.ones(shape=(X_test.shape[0],1))
     Dist=X_test_dots+X_app_dots-2*X_test.dot(X_app.T)
     return Dist
@@ -77,23 +77,21 @@ def kppv_distances(X_test,X_app):
 # print(Dist) 
 
 def kppv_predict(Dist,Y_app,K):
-    A=np.argsort(Dist,axis=1)[:,:K]
-    B=np.take(Y_app,A)
-    C=np.apply_along_axis(np.bincount,1,B,minlength=10) # effectifs pour chaque classe dans les K voisins
+    A=np.argsort(Dist,axis=1)[:,:K] # les positions des K plus proches voisins de la matrice de distance
+    B=np.take(Y_app,A) # les classes de ces K plus proches voisins
+    C=np.apply_along_axis(np.bincount,1,B,minlength=10) # effectifs pour chaque classe dans les K voisins, triés par numéro de classe et non par distance
     Y_pred=np.array([])
     for i in range(np.shape(B)[0]):
         l_class=[]
         for j in B[i]:
             if j not in l_class:
                 l_class.append(j)
-        class_reco=np.column_stack((l_class,np.zeros(len(l_class),dtype=int))) # les classes reconnues, dans l'ordre de proximité, avec compteurs associés
-        final_count=np.copy(class_reco) #une copie pour pouvoir modifier les compteurs
-        
+        class_reco=np.column_stack((l_class,np.zeros(len(l_class),dtype=int))) # les classes reconnues, dans l'ordre de proximité, avec compteurs associés (nuls pour le moment)
+        final_count=np.copy(class_reco) #une copie pour pouvoir modifier les compteurs par la suite
         for k,line in enumerate(class_reco):
-            final_count[k,1]=C[i,line[0]]
-        Y_pred=np.append(Y_pred,final_count[np.argmax(final_count[:,1]),0])
-            
-    return Y_pred
+            final_count[k,1]=C[i,line[0]] # calcul du nb d'apparition pour chaque classe reconnue
+        Y_pred=np.append(Y_pred,final_count[np.argmax(final_count[:,1]),0]) # on retient la classe avec le + grand nb d'apparitions, et la plus proche si égalité
+    return np.transpose(np.array([Y_pred]))
 
 #Y_pred=kppv_predict(Dist, Y_app, 3)
 # print(Y_pred)
