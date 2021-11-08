@@ -1,11 +1,12 @@
 from main_neurones import *
+from kppv_experimentations import *
 
 path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/'
 def change_nb_neurons(path):
     X,Y=lecture_cifar(path)
     losses=[]
     accuracies=[]
-    list_nb_neurons=range(1,2001,500)
+    list_nb_neurons=range(1,200,50)
     for nb_neurons in list_nb_neurons:
         loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-3,200)
         losses.append(loss_list)
@@ -48,7 +49,6 @@ def change_nb_neurons(path):
     print("Influence du nombre de neurones de la couche cachée sur la performance du classifieur : DONE")
     print("Etude sensibilité nb de neurones effectuée")
 
-
 def change_learning_rate(path):
     X,Y=lecture_cifar(path)
     losses=[]
@@ -71,14 +71,12 @@ def change_learning_rate(path):
     plt.legend()
     plt.savefig(fname='results_change_learning_rate.png',format='png')
     print("Etude sensibilité learning rate effectuée")
-
         
-def use_mini_batch(path,nb_batches,n_iter,D_h):
+def use_mini_batch(X,Y,nb_batches,n_iter,D_h,lr):
     
-    X,Y=lecture_cifar(path)
+    
     N,D_in=X.shape
     D_out=1
-
     # Génération aléatoire des mini batches
     mini_batches=np.split(np.random.permutation(np.arange(0,N)),nb_batches)
     D_out=1
@@ -90,48 +88,56 @@ def use_mini_batch(path,nb_batches,n_iter,D_h):
     B2 = np.zeros((1,D_out))
     loss_list=[]
     accuracy_list=[]
-    for batch in mini_batches:
-        for n in range(n_iter):
+    for n in range(n_iter):
+        for batch in mini_batches:
+        
             X_batch=X[list(batch)]/255
-            Y_batch=Y[list(batch)]
+            Y_batch=Y[list(batch)]/9
     
         ## Back propagation
         
-            O1,O2,loss=forward(X_batch, W1, B1, W2, B2, Y_batch)
-            W1,B1,W2,B2=back_propagate(X_batch, Y_batch, O1, O2, W1, W2, B1, B2, lr)
+            O1,O2,loss=forward_2layers(X_batch, W1, B1, W2, B2, Y_batch)
+            W1,B1,W2,B2=back_propagate_2layers(X_batch, Y_batch, O1, O2, W1, W2, B1, B2, lr)
             loss_list.append(loss)
-            accuracy_list.append(evaluation_classifieur(Y_batch, np.round(O2)))
+            accuracy_list.append(evaluation_classifieur(Y_batch*9, np.round(O2*9)))
     
     return loss_list,accuracy_list
 
-change_nb_neurons(path)
-change_learning_rate(path)
-
-
 def mini_batches(path):
+    X,Y=lecture_cifar(path)
     nb_batches=10
-    n_iter=100
-    D_h=100
-    lr=1e-2
-    loss_mini_b,accuracy_mini_b=use_mini_batch(path, nb_batches, n_iter, D_h)
-    loss_full,accuracy_full=train_nn_2layers(path, D_h, lr, n_iter)
-    plt.plot(loss_mini_b)
-    plt.plot(loss_full)
+    n_iter=250
+    D_h=500
+    lr=1e-3
+    loss_mini_b,accuracy_mini_b=use_mini_batch(X,Y, nb_batches, n_iter, D_h,lr)
+    loss_full,accuracy_full=train_nn_2layers(X,Y, D_h, lr, n_iter)
+    plt.figure(figsize=(12,8))
+    plt.subplot(211)
+    plt.title("Utilisation de 10 mini - batches")
+    plt.plot(loss_mini_b, label="Avec mini-batch")
+    plt.plot(loss_full,label="Sans mini-batch, échantillon complet")
+    plt.ylabel("Loss function")
+    plt.legend()
+    plt.subplot(212)
+    plt.plot(accuracy_mini_b,label="Avec mini-batch")
+    plt.plot(accuracy_full,label="Sans mini-batch, échantillon complet")
+    plt.ylabel("Accuracy")
+    plt.xlabel("Itérations")
+    plt.legend()
     plt.show()
-
-mini_batches(path)
+    
 
 def change_nb_layers(path):
     X,Y=lecture_cifar(path)
     D_h=1000
     D_h2=1000
     lr=1e-3
-    n_iter=500
+    n_iter=300
     loss_list_2,accuracy_list_2=train_nn_2layers(X,Y, D_h, lr, n_iter)
     loss_list_3,accuracy_list_3=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter)
     plt.figure(figsize=(12,8))
     plt.subplot(211)
-    plt.title("Ajout d'une couche sur la vitesse de convergence")
+    plt.title("Ajout d'une couche : effet sur la vitesse de convergence")
     plt.plot(loss_list_2,label='2 couches')
     plt.plot(loss_list_3,label='3 couches')
     plt.legend()
@@ -143,11 +149,17 @@ def change_nb_layers(path):
     plt.ylabel("Activation function")
     plt.xlabel("Nb d'itérations")
     plt.savefig(fname='results_change_nb_layers.png',format='png')
-    print("Ajout d'une couche sur la vitesse de convergence : DONE")
+    print("Ajout d'une couche pour la vitesse de convergence : DONE")
     # plt.show()
 
-
-
-change_nb_layers(path)
-
-    
+## Lancement des tests
+# try:
+#     change_nb_neurons(path)
+# try:
+#     change_learning_rate(path)
+# try:
+#     mini_batches(path)
+try:
+    change_nb_layers(path)
+except:
+    print("Erreur dans change nb layers")

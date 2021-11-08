@@ -19,10 +19,11 @@ def influence_param_k(path,k_max):
     plt.plot(l_k,l_accuracy)
     plt.xlabel('k voisins')
     plt.ylabel('Accuracy (%)')
-    plt.title(path.split('/')[-1])
+    plt.title("Variation du nombre de voisins")
     
     plt.savefig(fname='influence_k_results.png',format='png')
     # plt.savefig(fname='influence_k_results.svg',format='svg')
+    return l_k,l_accuracy
 
 ## Influence des descripteurs
 def influence_param_k_LBP(path,k_max):
@@ -42,10 +43,11 @@ def influence_param_k_LBP(path,k_max):
     plt.plot(l_k,l_accuracy)
     plt.xlabel('k voisins')
     plt.ylabel('Accuracy (%)')
-    plt.title(path.split('/')[-1])
+    plt.title("Utilisation du descripteur LBP")
     
     plt.savefig(fname='influence_k_avec_lbp_results.png',format='png')
     # plt.savefig(fname='influence_k_avec_lbp_results.svg',format='svg')
+    return l_k,l_accuracy
 
 def influence_param_k_HOG(path,k_max):
     X,Y=lecture_cifar(path)
@@ -64,11 +66,12 @@ def influence_param_k_HOG(path,k_max):
     plt.plot(l_k,l_accuracy)
     plt.xlabel('k voisins')
     plt.ylabel('Accuracy (%)')
-    plt.title(path.split('/')[-1])
+    plt.title("Utilisation du descripteur HOG")
     
     plt.savefig(fname='influence_k_avec_hog_results.png',format='png')
     # plt.savefig(fname='influence_k_avec_hog_results.svg',format='svg')
 
+    return l_k,l_accuracy
 
 ## Influence validation croisée
 def influence_param_k_avec_validation_croisee(path,k_max,nb_batches):
@@ -109,7 +112,35 @@ def influence_param_k_avec_validation_croisee(path,k_max,nb_batches):
 
 
 ## Lancement des tests
-# influence_param_k(path, 100)
-# influence_param_k_LBP(path, 100)
-# influence_param_k_HOG(path, 100)
-# influence_param_k_avec_validation_croisee(path, 200, 5) # repartition 80-20
+try:
+    l_k,l_accuracy=influence_param_k(path, 100)
+except:
+    print("Erreur dans param k")
+try:
+    l_k_lbp,l_accuracy_lbp=influence_param_k_LBP(path, 100)
+except:
+    print("Erreur dans LBP")
+try:
+    l_k_hog,l_accuracy_hog=influence_param_k_HOG(path, 100)
+except:
+    print("Erreur dans HOG")
+# try:
+#     influence_param_k_avec_validation_croisee(path, 200, 5) # repartition 80-20
+
+## Quelques tracés
+plt.figure()
+plt.plot(l_k,l_accuracy,label="Sans LBP")
+plt.plot(l_k_lbp,l_accuracy_lbp,label="Avec LBP")
+plt.xlabel('k voisins')
+plt.ylabel('Accuracy (%)')
+plt.title("Utilisation du descripteur LBP")
+plt.legend()
+plt.savefig(fname='influence_k_avec_lbp_results_2.png',format='png')
+plt.figure()
+plt.plot(l_k,l_accuracy,label="Sans HOG")
+plt.plot(l_k_hog,l_accuracy_hog,label="Avec HOG")
+plt.xlabel('k voisins')
+plt.ylabel('Accuracy (%)')
+plt.legend()
+plt.title("Utilisation du descripteur HOG")
+plt.savefig(fname='influence_k_avec_hog_results_2.png',format='png')

@@ -79,8 +79,8 @@ def back_propagate_2layers(X,Y,O1,O2,W1,W2,B1,B2,lr):
 
 def train_nn_2layers(X,Y,D_h,lr,n_iter):
     # Géometrie du problème
-    X=X[:1000,:]/255 # rescale pour faciliter la convergence
-    Y=Y[:1000,:]/9
+    X=X[:,:]/255 # rescale pour faciliter la convergence
+    Y=Y[:,:]/9
     N,D_in=X.shape
     D_out=1
     
