@@ -112,4 +112,4 @@ def influence_param_k_avec_validation_croisee(path,k_max,nb_batches):
 # influence_param_k(path, 100)
 # influence_param_k_LBP(path, 100)
 # influence_param_k_HOG(path, 100)
-influence_param_k_avec_validation_croisee(path, 200, 5) # repartition 80-20
+# influence_param_k_avec_validation_croisee(path, 200, 5) # repartition 80-20
