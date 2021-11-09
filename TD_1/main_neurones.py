@@ -106,8 +106,8 @@ def train_nn_2layers(X,Y,D_h,lr,n_iter):
 
 
 def train_nn_3layers(X,Y,D_h,D_h2,lr,n_iter):
-    X=X[:100,:]/255 # rescale pour faciliter la convergence
-    Y=Y[:100,:]
+    X=X[:,:]/255 # rescale pour faciliter la convergence
+    Y=Y[:,:]/9
     N,D_in=X.shape
     D_out=1
 
@@ -166,6 +166,6 @@ def train_nn_3layers(X,Y,D_h,D_h2,lr,n_iter):
         O1,O2,O3,loss=forward_3layers(X, W1, B1, W2, B2, W3, B3, Y)
         W1,B1,W2,B2,W3,B3=back_propagate_3layers(X, Y, O1, O2, O3, W1, W2, W3, B1, B2, B3, lr)
         loss_list.append(loss)
-        accuracy_list.append(evaluation_classifieur(Y, np.round(O2)))
+        accuracy_list.append(evaluation_classifieur(Y*9, np.round(O3*9)))
     
     return loss_list, accuracy_list

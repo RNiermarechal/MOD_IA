@@ -1,14 +1,15 @@
 from main_neurones import *
-from kppv_experimentations import *
 
 path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/'
 def change_nb_neurons(path):
     X,Y=lecture_cifar(path)
+    X=X[:10000,:]
+    Y=Y[:10000,:]
     losses=[]
     accuracies=[]
-    list_nb_neurons=range(1,200,50)
+    list_nb_neurons=range(1,2001,500)
     for nb_neurons in list_nb_neurons:
-        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-3,200)
+        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-4,200)
         losses.append(loss_list)
         accuracies.append(accuracy_list)
     plt.figure(figsize=(12,8))
@@ -33,7 +34,7 @@ def change_nb_neurons(path):
     accuracies_end=[] # accuracy à la fin de l'optimisation des poids
     list_Dh=range(1,2000,50)
     for nb_neurons in list_Dh:
-        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-3,200)
+        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-4,200)
         losses_end.append(loss_list[-1])
         accuracies_end.append(accuracy_list[-1])
     plt.figure(figsize=(12,8))
@@ -51,9 +52,11 @@ def change_nb_neurons(path):
 
 def change_learning_rate(path):
     X,Y=lecture_cifar(path)
+    X=X[:10000,:]
+    Y=Y[:10000,:]
     losses=[]
     accuracies=[]
-    lr_list=[1e-4,1e-3,1e-2,1e-1]
+    lr_list=[1e-5,1e-4,1e-3,1e-2,1e-1]
     for lr in lr_list:
         loss_list,accuracy_list=train_nn_2layers(X,Y,1000,lr,200)
         losses.append(loss_list)
@@ -129,10 +132,12 @@ def mini_batches(path):
 
 def change_nb_layers(path):
     X,Y=lecture_cifar(path)
-    D_h=1000
+    X=X[:1000,:]
+    Y=Y[:1000,:]
+    D_h=750
     D_h2=1000
-    lr=1e-3
-    n_iter=300
+    lr=1e-4
+    n_iter=1000
     loss_list_2,accuracy_list_2=train_nn_2layers(X,Y, D_h, lr, n_iter)
     loss_list_3,accuracy_list_3=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter)
     plt.figure(figsize=(12,8))
@@ -146,20 +151,55 @@ def change_nb_layers(path):
     plt.plot(accuracy_list_2,label='2 couches')
     plt.plot(accuracy_list_3,label='3 couches')
     plt.legend()
-    plt.ylabel("Activation function")
+    plt.ylabel("Accuracy")
     plt.xlabel("Nb d'itérations")
     plt.savefig(fname='results_change_nb_layers.png',format='png')
     print("Ajout d'une couche pour la vitesse de convergence : DONE")
     # plt.show()
 
+def descripteurs_3layers(path):
+    X,Y=lecture_cifar(path)
+    X=X[:1000,:]
+    Y=Y[:1000,:]
+    D_h=750
+    D_h2=1000
+    lr=1e-4
+    n_iter=1000
+    loss_list,accuracy_list=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter)
+    X_lbp=add_LPB(X)
+    loss_list_lbp,accuracy_list_lbp=train_nn_3layers(X_lbp,Y, D_h,D_h2, lr, n_iter)
+    X_hog=add_LPB(X)
+    loss_list_hog,accuracy_list_hog=train_nn_3layers(X_hog,Y, D_h,D_h2, lr, n_iter)
+
+    plt.figure(figsize=(12,8))
+    plt.subplot(211)
+    plt.title("Ajout de descripteurs sur réseau à 3 couches")
+    plt.plot(loss_list,label='3 couches')
+    plt.plot(loss_list_lbp,label='3 couches avec LBP')
+    plt.plot(loss_list_hog,label='3 couches avec HOG')
+    plt.legend()
+    plt.ylabel("Loss function")
+    plt.subplot(212)
+    plt.plot(accuracy_list,label='3 couches')
+    plt.plot(accuracy_list_lbp,label='3 couches avec LBP')
+    plt.plot(accuracy_list_hog,label='3 couches avec HOG')
+    plt.legend()
+    plt.ylabel("Accuracy")
+    plt.xlabel("Nb d'itérations")
+    plt.savefig(fname='results_3layers_descripteurs.png',format='png')
+    print("Ajout de descripteurs : DONE")
 ## Lancement des tests
-# try:
-#     change_nb_neurons(path)
-# try:
-#     change_learning_rate(path)
+try:
+    change_nb_neurons(path)
+except:
+    print("Erreur dans le nb de neurones")
+try:
+    change_learning_rate(path)
+except:
+    print("Erreur dans learning rate")
 # try:
 #     mini_batches(path)
-try:
-    change_nb_layers(path)
-except:
-    print("Erreur dans change nb layers")
+# try:
+#     change_nb_layers(path)
+# except:
+#     print("Erreur dans change nb layers")
