@@ -3,38 +3,38 @@ from main_neurones import *
 path='D:/Robin Niermaréchal/Documents/ECL/3A/S9/MOD/IA/MOD_IA/TD_1/cifar-10-batches-py/'
 def change_nb_neurons(path):
     X,Y=lecture_cifar(path)
-    X=X[:10000,:]
+    X=X[:10000,:] # restriction de nb d'images, batch original trop grand
     Y=Y[:10000,:]
-    losses=[]
-    accuracies=[]
-    list_nb_neurons=range(1,2001,500)
-    for nb_neurons in list_nb_neurons:
-        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-4,200)
-        losses.append(loss_list)
-        accuracies.append(accuracy_list)
-    plt.figure(figsize=(12,8))
-    plt.subplot(211)
-    plt.title("Influence du nombre de neurones de la couche cachée sur la vitesse de convergence")
-    for i,loss in enumerate(losses):
-        plt.plot(loss,label=str(list_nb_neurons[i])+' neurones')
-    plt.ylabel("Loss function")
-    plt.legend()
-    plt.subplot(212)
-    for i,accuracy in enumerate(accuracies):
-        plt.plot(accuracy,label=str(list_nb_neurons[i])+' neurones')
-    plt.ylabel("Accuracy")
-    plt.xlabel("Itérations")
-    plt.legend()
-    plt.savefig(fname='results_change_nb_neurons_1.png',format='png')
-    print("Influence du nombre de neurones de la couche cachée sur la vitesse de convergence : DONE")
+    # losses=[]
+    # accuracies=[]
+    # list_nb_neurons=range(1,2001,500)
+    # for nb_neurons in list_nb_neurons:
+    #     loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-4,200)
+    #     losses.append(loss_list) #fonction de perte
+    #     accuracies.append(accuracy_list) #taux de classification
+    # plt.figure(figsize=(12,8))
+    # plt.subplot(211)
+    # plt.title("Influence du nombre de neurones de la couche cachée sur la vitesse de convergence")
+    # for i,loss in enumerate(losses):
+    #     plt.plot(loss,label=str(list_nb_neurons[i])+' neurones')
+    # plt.ylabel("Loss function")
+    # plt.legend()
+    # plt.subplot(212)
+    # for i,accuracy in enumerate(accuracies):
+    #     plt.plot(accuracy,label=str(list_nb_neurons[i])+' neurones')
+    # plt.ylabel("Accuracy")
+    # plt.xlabel("Itérations")
+    # plt.legend()
+    # plt.savefig(fname='results_change_nb_neurons_1.png',format='png')
+    # print("Influence du nombre de neurones de la couche cachée sur la vitesse de convergence : DONE")
 
-    #plt.show()
+    # #plt.show()
 
     losses_end=[] # loss à la fin de l'optimisation des poids
     accuracies_end=[] # accuracy à la fin de l'optimisation des poids
     list_Dh=range(1,2000,50)
     for nb_neurons in list_Dh:
-        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-4,200)
+        loss_list,accuracy_list=train_nn_2layers(X,Y,nb_neurons,1e-4,200) # nb d'iterations fixé à 200 pour accélérer le calcul
         losses_end.append(loss_list[-1])
         accuracies_end.append(accuracy_list[-1])
     plt.figure(figsize=(12,8))
@@ -52,11 +52,11 @@ def change_nb_neurons(path):
 
 def change_learning_rate(path):
     X,Y=lecture_cifar(path)
-    X=X[:10000,:]
+    X=X[:10000,:] # restriction de nb d'images, batch original trop grand
     Y=Y[:10000,:]
     losses=[]
     accuracies=[]
-    lr_list=[1e-5,1e-4,1e-3,1e-2,1e-1]
+    lr_list=[1e-5,1e-4,1e-3,1e-2,1e-1] # les learning rate à étudier
     for lr in lr_list:
         loss_list,accuracy_list=train_nn_2layers(X,Y,1000,lr,200)
         losses.append(loss_list)
@@ -132,14 +132,14 @@ def mini_batches(path):
 
 def change_nb_layers(path):
     X,Y=lecture_cifar(path)
-    X=X[:1000,:]
-    Y=Y[:1000,:]
-    D_h=750
-    D_h2=1000
-    lr=1e-4
-    n_iter=1000
-    loss_list_2,accuracy_list_2=train_nn_2layers(X,Y, D_h, lr, n_iter)
-    loss_list_3,accuracy_list_3=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter)
+    X=X[:10000,:] # restriction de nb d'images, batch original trop grand
+    Y=Y[:10000,:]
+    D_h=750 # couche 1
+    D_h2=1000 # couche 2
+    lr=1e-4 # learing rate fixé
+    n_iter=1000 # nb d'itérations pour l'entrainement
+    loss_list_2,accuracy_list_2=train_nn_2layers(X,Y, D_h, lr, n_iter) #entrainement pour 2 couches
+    loss_list_3,accuracy_list_3=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter) # entrainement pour 3 couches
     plt.figure(figsize=(12,8))
     plt.subplot(211)
     plt.title("Ajout d'une couche : effet sur la vitesse de convergence")
@@ -159,17 +159,18 @@ def change_nb_layers(path):
 
 def descripteurs_3layers(path):
     X,Y=lecture_cifar(path)
-    X=X[:1000,:]
+    X=X[:1000,:] # restriction de nb d'images, batch original trop grand
     Y=Y[:1000,:]
+    ## Paramètres identiques à l'étude réalisée dans change_nb_layers
     D_h=750
     D_h2=1000
     lr=1e-4
     n_iter=1000
-    loss_list,accuracy_list=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter)
+    loss_list,accuracy_list=train_nn_3layers(X,Y, D_h,D_h2, lr, n_iter) #3 couches sans descripteurs
     X_lbp=add_LPB(X)
-    loss_list_lbp,accuracy_list_lbp=train_nn_3layers(X_lbp,Y, D_h,D_h2, lr, n_iter)
+    loss_list_lbp,accuracy_list_lbp=train_nn_3layers(X_lbp,Y, D_h,D_h2, lr, n_iter) #3 couches avec LBP
     X_hog=add_LPB(X)
-    loss_list_hog,accuracy_list_hog=train_nn_3layers(X_hog,Y, D_h,D_h2, lr, n_iter)
+    loss_list_hog,accuracy_list_hog=train_nn_3layers(X_hog,Y, D_h,D_h2, lr, n_iter) #3 couches avec HOG
 
     plt.figure(figsize=(12,8))
     plt.subplot(211)
@@ -193,13 +194,17 @@ try:
     change_nb_neurons(path)
 except:
     print("Erreur dans le nb de neurones")
-try:
-    change_learning_rate(path)
-except:
-    print("Erreur dans learning rate")
+# try:
+#     change_learning_rate(path)
+# except:
+#     print("Erreur dans learning rate")
 # try:
 #     mini_batches(path)
-# try:
-#     change_nb_layers(path)
-# except:
-#     print("Erreur dans change nb layers")
+try:
+    change_nb_layers(path)
+except:
+    print("Erreur dans change nb layers")
+try:
+    descripteurs_3layers(path)
+except:
+    print("Erreur dans descripteurs")
